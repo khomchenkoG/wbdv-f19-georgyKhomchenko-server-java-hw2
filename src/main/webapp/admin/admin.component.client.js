@@ -14,7 +14,6 @@
 
     var userService = new AdminUserServiceClient();
 
-    var users = [];
     $(main);
 
     function main() {
@@ -34,7 +33,7 @@
         $createBtn.click(createUser);
         $updateBtn.click(updateUser);
 
-        findAllUsers(users);
+        findAllUsers();
     }
 
     function createUser() {
@@ -59,41 +58,28 @@
             id: (Date.now()) + ''
         }
 
-        fetch("https://wbdv-generic-server.herokuapp.com/api/khomchenkog/users", {
-            method: 'post',
-            body: JSON.stringify(newUser),
-            headers: {
-                'content-type': 'application/json'
-            }
-        }).then(findAllUsers)
+        userService.createUser(newUser, findAllUsers);
     }
 
     function findAllUsers() {
-        fetch("https://wbdv-generic-server.herokuapp.com/api/khomchenkog/users")
-            .then(response => response.json())
-            .then(renderUsers)
+        userService.findAllUsers(renderUsers);
     }
 
     function findUserById(userId) {
-        return fetch("https://wbdv-generic-server.herokuapp.com/api/khomchenkog/users/" + userId)
-            .then(response => response.json())
+         userService.findUserById(userId, renderEditUser);
     }
 
 
     function selectUser() {
         const editButton = $(event.currentTarget);
         const userIdToUpdate = editButton.attr("id");
-        findUserById(userIdToUpdate).then(renderEditUser)
+        findUserById(userIdToUpdate)
     }
 
     function deleteUser() {
-        const deleteButton = $(event.currentTarget)
-        const userIdToDelete = deleteButton.attr("id")
-
-        fetch("https://wbdv-generic-server.herokuapp.com/api/khomchenkog/users/" + userIdToDelete, {
-                method: 'delete'
-            })
-            .then(findAllUsers)
+        const deleteButton = $(event.currentTarget);
+        const userIdToDelete = deleteButton.attr("id");
+        userService.deleteUser(userIdToDelete, findAllUsers);
     }
 
 
@@ -104,15 +90,11 @@
         $firstNameFld.val(user.first_name);;
         $lastNameFld.val(user.last_name);
         $roleFld.val(user.role);
-
         $updateBtn.attr("id", user.id)
-
-
     }
 
     function updateUser() {
         const userIdToUpdate = $(event.currentTarget).attr("id")
-
         const newUsername = $usernameFld.val();
         const newPass = $passwordFld.val();
         const newFirstN = $firstNameFld.val();
@@ -133,13 +115,7 @@
             role: newRole,
         }
 
-        fetch("https://wbdv-generic-server.herokuapp.com/api/khomchenkog/users/" + userIdToUpdate, {
-            method: 'put',
-            body: JSON.stringify(updatedUser),
-            headers: {
-                'content-type': 'application/json'
-            }
-        }).then(findAllUsers)
+        userService.updateUser(userIdToUpdate, updatedUser, findAllUsers)
     }
 
     function renderUser(user) {

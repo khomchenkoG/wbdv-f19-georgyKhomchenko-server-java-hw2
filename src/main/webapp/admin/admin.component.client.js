@@ -12,6 +12,8 @@
     var $createBtn;
     var $updateBtn;
 
+    var selectedUser;
+
     var userService = new AdminUserServiceClient();
 
     $(main);
@@ -85,6 +87,7 @@
 
 
     function renderEditUser(user) {
+        selectedUser = user;
         $usernameFld.val(user.username);
         $passwordFld.val(user.password);
         $firstNameFld.val(user.first_name);;
@@ -94,12 +97,13 @@
     }
 
     function updateUser() {
-        const userIdToUpdate = $(event.currentTarget).attr("id")
+        const userIdToUpdate = selectedUser.id
         const newUsername = $usernameFld.val();
         const newPass = $passwordFld.val();
         const newFirstN = $firstNameFld.val();
         const newLasrN = $lastNameFld.val();
         const newRole = $roleFld.val();
+        selectedUser = {};
 
         $usernameFld.val("").blur();
         $passwordFld.val("").blur();
@@ -114,12 +118,15 @@
             last_name: newLasrN,
             role: newRole,
         }
+        
 
         userService.updateUser(userIdToUpdate, updatedUser, findAllUsers)
+
     }
 
     function renderUser(user) {
         $tr = $userRowTemplate.clone()
+        $tr.attr("class", "web-dev_user")
         $tr.find(".wbdv-username").html(user.username)
         $tr.find(".wbdv-first-name").html(user.first_name)
         $tr.find(".wbdv-last-name").html(user.last_name)
